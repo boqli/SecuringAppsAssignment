@@ -1,0 +1,14 @@
+﻿@model IQueryable<ShoppingCart.Application.ViewModels.AssignmentViewModel>
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<div class="text-center">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        @if (User.IsInRole("Teacher"))
+        {
+            @Html.Partial("AssignmentViewPartial", Model);
+        }
+    }
+</div>
