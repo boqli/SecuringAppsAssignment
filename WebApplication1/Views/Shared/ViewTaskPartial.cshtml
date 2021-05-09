@@ -1,0 +1,27 @@
+﻿@model IEnumerable<ShoppingCart.Application.ViewModels.CreateTaskViewModel>
+
+<br />
+@foreach (var item in Model)
+{
+    //if statement checking if the student belongs to teacher
+    <div class="card text-center" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title">@item.taskTitle</h5>
+            <p class="card-subtitle">@item.taskDescription</p><br />
+            <p class="card-text">Deadline: @item.taskDeadline</p>
+            @if (User.IsInRole("Teacher"))
+            {
+                <a href="/FileUpload?taskId=@item.taskId" type="button" class="btn btn-danger">View Submissions</a>
+            }
+            @if (!(User.IsInRole("Teacher")))
+            {
+                <a href="/FileUpload/Upload?taskId=@item.taskId" type="button" class="btn btn-danger">Submit Assignment</a>
+            }
+
+
+        </div>
+    </div><br />
+    //#0_r$RLA
+    //student password
+
+}

@@ -1,0 +1,19 @@
+﻿@model IEnumerable<ShoppingCart.Application.ViewModels.AssignmentViewModel>
+
+<br />
+@foreach (var item in Model)
+{
+    //if statement checking if the student belongs to teacher
+    <div class="card text-center" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title">@item.FileName</h5>
+            <p class="card-subtitle">@item.Description</p><br />
+            <p class="card-text">Deadline: @item.Owner</p>
+            <a href="/FileUpload/Download?taskId=@item.Id" type="button" class="btn btn-danger">Download Assignment</a>
+        </div>
+    </div>
+    <br />
+    //#0_r$RLA
+    //student password
+
+}

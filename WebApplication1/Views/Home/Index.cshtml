@@ -1,0 +1,28 @@
+﻿@model IQueryable<ShoppingCart.Application.ViewModels.CreateTaskViewModel>
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        @if (!(User.IsInRole("Teacher")))
+        {
+            <h1 class="display-4">Welcome Student!</h1>
+            <br />
+
+        }
+        @if (User.IsInRole("Teacher"))
+        {
+            <h1 class="display-4">Welcome Teacher!</h1>
+        }
+    }
+    else
+    {
+        <h1 class="display-4">Welcome</h1>
+        <p> Enjoy your stay</p>
+    }
+</div>
