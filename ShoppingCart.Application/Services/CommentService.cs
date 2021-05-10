@@ -13,7 +13,6 @@ namespace ShoppingCart.Application.Services
 {
     public class CommentService : ICommentService
     {
-
         private IMapper _mapper;
         private ICommentRepository _commentRepo;
         public CommentService(ICommentRepository commentRepository, IMapper mapper)
