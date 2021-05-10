@@ -1,0 +1,30 @@
+﻿@model ShoppingCart.Application.ViewModels.CommentViewModel
+
+@{
+    ViewData["Title"] = "Comment";
+}
+
+<h1 class="display-4 text-center">Comment On Task</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Comment">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+                <label asp-for="CommentText" class="control-label">Comment</label>
+                <input asp-for="CommentText" class="form-control" />
+                <span asp-validation-for="CommentText" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input asp-for="CommenterId" class="form-control" hidden value="@User.Identity.Name" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+

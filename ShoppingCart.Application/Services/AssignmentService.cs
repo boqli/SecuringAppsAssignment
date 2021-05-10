@@ -55,6 +55,32 @@ namespace ShoppingCart.Application.Services
 
         }
 
+        public IQueryable<AssignmentViewModel> GetAssignments(Guid taskId)
+        {
+            var assignments = _assignmentRepo.GetAssignments().Where(x => x.Task.taskId == taskId)
+                       .ProjectTo<AssignmentViewModel>(_autoMapper.ConfigurationProvider);
+            return assignments;
+
+        }
+
+        public IQueryable<AssignmentViewModel> GetAssignments(string owner)
+        {
+            var assignments = _assignmentRepo.GetAssignments().Where(x => x.Owner == owner)
+                       .ProjectTo<AssignmentViewModel>(_autoMapper.ConfigurationProvider);
+            return assignments;
+
+        }
+
+
+        public AssignmentViewModel GetAssignment(Guid id)
+        {
+            //AutoMapper
+
+            var myAssign = _assignmentRepo.GetAssignment(id);
+            var result = _autoMapper.Map<AssignmentViewModel>(myAssign);
+            return result;
+        }
+
 
     }
 }

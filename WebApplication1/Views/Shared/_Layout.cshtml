@@ -25,9 +25,10 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+                        <!--
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    </li>-->
                         @if (User.IsInRole("Teacher"))
                         {
                             <li class="nav-item">
@@ -37,6 +38,8 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="TaskUpload" asp-action="Upload">Create Task</a>
                             </li>
+
+
                         }
                         @if (!(User.IsInRole("Teacher")))
                         {
@@ -46,15 +49,18 @@
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="TaskUpload" asp-action="Index">View Tasks</a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="FileUpload" asp-action="AssignList">View Assignments</a>
+                                </li>
                             }
                         }
                         <!--
-                        if (!(User.IsInRole("Teacher")))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="FileUpload" asp-action="Upload">Submit Assignment</a>
-                            </li>
-                        }-->
+    if (!(User.IsInRole("Teacher")))
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="FileUpload" asp-action="Upload">Submit Assignment</a>
+        </li>
+    }-->
                     </ul>
                 </div>
             </div>

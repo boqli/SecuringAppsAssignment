@@ -13,6 +13,7 @@ namespace ShoppingCart.Application.AutoMapper
             CreateMap<Task, CreateTaskViewModel>();
             CreateMap<Assignment, AssignmentViewModel>();
             CreateMap<StudentTeacher, StudentTeacherViewModel>();
+            CreateMap<Comment, CommentViewModel>();
             //Product class was used to model the database
             //ProductViewModel class was used to pass on the data to/from the Presentation project/layer
         }

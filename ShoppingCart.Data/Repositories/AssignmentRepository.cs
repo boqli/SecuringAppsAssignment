@@ -36,6 +36,28 @@ namespace ShoppingCart.Data.Repositories
             //ShoppingCartDbContext context = new ShoppingCartDbContext();
             return _context.Assignment;
         }
+        public IQueryable<Assignment> GetAssignments(Guid taskid)
+        {
+            //ShoppingCartDbContext context = new ShoppingCartDbContext();
+            //single or default will return ONE product! or null
+            return _context.Assignment.Where(x => x.TaskId == taskid);
+        }
+
+
+        public IQueryable<Assignment> GetAssignments(string owner)
+        {
+            //ShoppingCartDbContext context = new ShoppingCartDbContext();
+            //single or default will return ONE product! or null
+            return _context.Assignment.Where(x => x.Owner == owner);
+        }
+
+        public Assignment GetAssignment(Guid id)
+        {
+            //ShoppingCartDbContext context = new ShoppingCartDbContext();
+            //single or default will return ONE product! or null
+            return _context.Assignment.SingleOrDefault(x => x.Id == id);
+        }
+
 
     }
 }

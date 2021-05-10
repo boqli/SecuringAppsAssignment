@@ -2,14 +2,15 @@
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
-<h1 class="text-center display-4">Uploaded Files For Task</h1>
-<br /><br />
+<h1 class="text-center display-4">Uploaded Files</h1>
+<br />
+<br />
 <div class="text-center">
     @if (SignInManager.IsSignedIn(User))
     {
-        @if (User.IsInRole("Teacher"))
+        @if (!(User.IsInRole("Teacher")))
         {
-            @Html.Partial("AssignmentViewPartial", Model);
+            @Html.Partial("StudentAssignmentPartial", Model);
         }
     }
 </div>

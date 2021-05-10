@@ -15,5 +15,12 @@ namespace ShoppingCart.Domain.Interfaces
         IQueryable<Assignment> GetAssignments();
 
         Task GetTask(Guid id);
+
+        IQueryable<Assignment> GetAssignments(Guid taskid);
+
+        IQueryable<Assignment> GetAssignments(string owner);
+
+
+        Assignment GetAssignment(Guid id);
     }
 }

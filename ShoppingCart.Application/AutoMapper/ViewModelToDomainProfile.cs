@@ -16,6 +16,7 @@ namespace ShoppingCart.Application.AutoMapper
             CreateMap<CreateTaskViewModel, Task>();
             CreateMap<AssignmentViewModel, Assignment>();
             CreateMap<StudentTeacherViewModel, StudentTeacher>();
+            CreateMap<CommentViewModel, Comment>();
         }
     }
 }

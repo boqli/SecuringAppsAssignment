@@ -54,10 +54,12 @@ namespace WebApplication1.Controllers
             if(ct.taskDeadline > DateTime.Now)
             {
                 _createTaskService.AddTask(ct);
+                TempData["message"] = "Task was created successfully";
                 return RedirectToAction("Index", "Home");
             }
             else
             {
+                TempData["message"] = "Task failed to be created";
                 return View();
             }
             

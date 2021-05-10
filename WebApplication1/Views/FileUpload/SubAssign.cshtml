@@ -1,0 +1,20 @@
+﻿@model IEnumerable<ShoppingCart.Application.ViewModels.AssignmentViewModel>
+
+<br />
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-4">
+            <div class="card text-center" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title">@item.FileName</h5>
+                    <p class="card-subtitle">@item.Description</p><br />
+                    <p class="card-text">Deadline: @item.Owner</p>
+                    <a href="/FileUpload/SubAssign?taskId=@item.TaskId" type="button" class="btn btn-danger">View Assignment</a>
+                </div>
+            </div>
+            <br />
+        </div>
+
+    }
+</div>

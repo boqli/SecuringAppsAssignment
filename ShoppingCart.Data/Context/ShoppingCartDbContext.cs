@@ -17,7 +17,7 @@ namespace ShoppingCart.Data.Context
         public DbSet<StudentTeacher> StudentTeacher { get; set; }
         public DbSet<Task> Task { get; set; }
         public DbSet<Assignment> Assignment { get; set; }
-
+        public DbSet<Comment> Comment { get; set; }
         //Add more to upload file n shit
 
 

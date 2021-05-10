@@ -1,0 +1,16 @@
+﻿@model IQueryable<ShoppingCart.Application.ViewModels.CommentViewModel>
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+<h1 class="text-center display-4">Comments On Assignment</h1>
+<br />
+<br />
+<div class="text-center">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        //if (User.IsInRole("Teacher"))
+        //{
+        @Html.Partial("CommentPartial", Model);
+        //}
+    }
+</div>
