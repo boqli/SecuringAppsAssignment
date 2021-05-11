@@ -32,9 +32,11 @@ namespace WebApplication1.Controllers
         {
             _logger.LogInformation("Home Index accessed");
             //var list = _createTaskService.GetTasks();
-           // var list2 = _studentTeacherService.GetStudents();
-           // ViewBag.StudentTeacher = list2;
+            // var list2 = _studentTeacherService.GetStudents();
+            // ViewBag.StudentTeacher = list2;
             //var list = _studentTeacherService.GetStudents(User.Identity.Name);
+            var ip = HttpContext.Connection.RemoteIpAddress;
+            _logger.LogInformation("-->" + User.Identity.Name + " has successfully accessed the home index from this Ip address " + ip);
             return View();//list
         }
 

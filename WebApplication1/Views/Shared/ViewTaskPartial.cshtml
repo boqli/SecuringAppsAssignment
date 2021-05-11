@@ -12,10 +12,12 @@
                     <p class="card-text">Deadline: @item.taskDeadline</p>
                     @if (User.IsInRole("Teacher"))
                     {
-                        <a href="/FileUpload?taskId=@item.taskId" type="button" class="btn btn-danger">View Submissions</a>
+                        <a asp-action="Index" asp-controller="FileUpload" asp-route-id=@Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(@item.taskId.ToString())) class="btn btn-danger">View Submissions</a>
+                        <!--<a href="/FileUpload?taskId=@item.taskId" type="button" class="btn btn-danger">View Submissions</a-->
                     }
                     @if (!(User.IsInRole("Teacher")))
                     {
+                        <!--a asp-action="Upload" asp-controller="FileUpload" asp-route-id=@Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(@item.taskId.ToString())) class="btn btn-danger">Submit Assignment</a>-->
                         <a href="/FileUpload/Upload?taskId=@item.taskId" type="button" class="btn btn-danger">Submit Assignment</a>
                     }
                 </div>

@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using WebApplication1.Models;
+using WebApplication1.Utility;
 
 namespace WebApplication1.Areas.Identity.Pages.Account
 {
@@ -145,7 +146,8 @@ namespace WebApplication1.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email };
+                var pubpriKeys = Encryption.GenerateAsymmetricKeys();
+                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email , PublicKey = pubpriKeys.PublicKey , PrivateKey= pubpriKeys.PrivateKey};
 
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)

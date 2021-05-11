@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ShoppingCart.Application.Interfaces;
@@ -21,28 +23,37 @@ namespace WebApplication1.Controllers
     {
         private static Guid taskID;
         private static Guid assignmentID;
-        //itfa shit tal assignment awnekk
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IAssignmentService _assignmentService;
         private readonly ICommentService _commentService;
         private readonly ILogger<FileUploadController> _logger;
         private IWebHostEnvironment _env;
 
-        public FileUploadController(ILogger<FileUploadController> logger, ICommentService commentService, IAssignmentService assignmentService, IWebHostEnvironment env)
+        public FileUploadController(ILogger<FileUploadController> logger, UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager , ICommentService commentService, IAssignmentService assignmentService, IWebHostEnvironment env)
         {
             _logger = logger;
             _env = env;
+            _userManager = userManager;
+            _signInManager = signInManager;
             _assignmentService = assignmentService;
             _commentService = commentService;
         }
-        public IActionResult Index(Guid taskId)
+        public IActionResult Index(string Id)
         {
             if (User.IsInRole("Teacher"))
             {
-                var list = _assignmentService.GetAssignments(taskId);
-                    //_createTaskService.GetTasks().Where(x => x.teacherEmail == User.Identity.Name && x.taskDeadline > DateTime.Now);
-                return View(list);
+                Guid decriptID = new Guid(System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(Id)));
+                return View(_assignmentService.GetAssignments(decriptID));
+                //var list = _assignmentService.GetAssignments(taskId);
+                //_createTaskService.GetTasks().Where(x => x.teacherEmail == User.Identity.Name && x.taskDeadline > DateTime.Now);
+                //return View(list);
             }
-            _logger.LogInformation("Home Index accessed");
+
+            var ip = HttpContext.Connection.RemoteIpAddress;
+            _logger.LogInformation("-->"+User.Identity.Name + " has accessed the home page from this Ip address " + ip);
+            
             return View();
         }
 
@@ -56,22 +67,25 @@ namespace WebApplication1.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public IActionResult Upload(IFormFile file, AssignmentViewModel avm)
+        public async Task<IActionResult> UploadAsync(IFormFile file, AssignmentViewModel avm)
         {
             try
             {
                 if (avm != null)
                 {
                     avm.Description = HtmlEncoder.Default.Encode(avm.Description);
-                    string fileName;
+                    avm.FileName = HtmlEncoder.Default.Encode(avm.FileName);
+                    var ip = HttpContext.Connection.RemoteIpAddress; ;
                     if (System.IO.Path.GetExtension(file.FileName) == ".pdf" && file.Length < 1048576)
                     {
                         //25 50 44 46 2d >> 37 80 68 70 45 PDF
                         byte[] whitelist = new byte[] { 37, 80, 68, 70, 45 };
                         if (file != null)
                         {
+                            var sign = await _userManager.FindByNameAsync(User.Identity.Name);
+                            
                             MemoryStream userFile = new MemoryStream();
-
+                            
                             using (var f = file.OpenReadStream())
                             {
                                 byte[] buffer = new byte[5];  //how to read an x amount of bytes at 1 go
@@ -92,9 +106,12 @@ namespace WebApplication1.Controllers
                                 //...other reading of bytes happening
                                 f.Position = 0;
                                 //uploading the file
-                                fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
+                                string fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
                                 avm.Path = fileName;
                                 avm.TaskId = taskID;
+                                MemoryStream msIn = new MemoryStream(Encoding.UTF32.GetBytes(fileName));
+                                string signature = Encryption.SignData(msIn, sign.PrivateKey);
+                                avm.Signature = signature;
                                 string absolutePath = _env.WebRootPath + @"\Files\" + fileName;
                                 try
                                 {
@@ -108,7 +125,8 @@ namespace WebApplication1.Controllers
                                 catch (Exception ex)
                                 {
                                     //log
-                                    _logger.LogError(ex, "Error happend while saving file");
+                                    
+                                    _logger.LogError("-->" + User.Identity.Name + " has encountered an error while saving file from this Ip address " + ip + " || " + ex);
                                     return View("Error", new ErrorViewModel() { Message = "Error while saving the file. Try again later" });
                                 }
                             }
@@ -121,6 +139,8 @@ namespace WebApplication1.Controllers
                     }
                     _assignmentService.AddAssignment(avm);
                     TempData["message"] = "Assignment added successfully";
+                    ip = HttpContext.Connection.RemoteIpAddress;
+                    _logger.LogInformation("-->" + User.Identity.Name + " has successfully saved a file from this Ip address " + ip);
                     return View();
                 }
                 else
@@ -139,21 +159,36 @@ namespace WebApplication1.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Teacher")]
-        public IActionResult Download(Guid AssignId)
+        public async Task<IActionResult> DownloadAsync(Guid AssignId)
         {
+            
             //1. get who is the owner of the file with id = id
             //2. you fetch the private key
             //3. call the HybridDecrypt 
-            
+
             var assignment = _assignmentService.GetAssignment(AssignId);
             var webClient = new System.Net.WebClient();
             string absolutePath = _env.WebRootPath + @"\Files\" + assignment.Path;
             var downData = webClient.DownloadData(absolutePath);
-            MemoryStream toDownload = new MemoryStream();// = HybridDecrypt(...)
-            new System.IO.MemoryStream(downData);
+            var sign = await _userManager.FindByNameAsync(User.Identity.Name);
+            MemoryStream toDownload = new MemoryStream(Encoding.UTF32.GetBytes(assignment.FileName));// = HybridDecrypt(...)
+            //new System.IO.MemoryStream(downData);
+            bool result = Encryption.VerifyData(toDownload, sign.PublicKey, assignment.Signature);
+            //bool = false
             var fileDownloadName = assignment.FileName+".pdf";
-            return File(toDownload, "application/octet-stream" , Guid.NewGuid() + fileDownloadName);
-           
+            var ip = HttpContext.Connection.RemoteIpAddress;
+            _logger.LogInformation("-->" + User.Identity.Name + " has successfully downloaded a file from this Ip address " + ip);
+            return File(toDownload, "application/octet-stream" , Guid.NewGuid() +"-"+ fileDownloadName);
+
+            
+
+            /*
+            MemoryStream toDownload = new MemoryStream(Encoding.UTF32.GetBytes(fileName));
+            toDownload.Position = 0;
+
+            bool result = Encryption.VerifyData(msIn2, sign.PublicKey, signature);
+
+          */
         }
 
         [HttpGet]
@@ -168,27 +203,40 @@ namespace WebApplication1.Controllers
         [Authorize]
         public IActionResult Comment(Guid AssignId, CommentViewModel cvm)
         {
+
             cvm.AssignmentID = assignmentID;
-
+            cvm.CommentText = HtmlEncoder.Default.Encode(cvm.CommentText);
             _commentService.AddComment(cvm);
+            var ip = HttpContext.Connection.RemoteIpAddress;
+            _logger.LogInformation("-->" + User.Identity.Name + " has successfully added a comment from this Ip address " + ip);
             TempData["message"] = "Comment was added successfully";
+            //Guid decriptID = new Guid(System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(AssignId)));
+            //return View(_commentService.GetComments(decriptID));
             return View();
-
         }
+        [HttpGet]
         [Authorize]
-        public IActionResult ViewComments(Guid AssignId)
+        public IActionResult ViewComments(string Id)
         {
-            var list = _commentService.GetComments(AssignId);
-            return View(list);  
+            Guid decriptID = new Guid(System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(Id)));
+            var ip = HttpContext.Connection.RemoteIpAddress;
+            _logger.LogInformation("-->" + User.Identity.Name + " has viewed comments on an assignment from this Ip address " + ip);
+            return View(_commentService.GetComments(decriptID));
+            //var list = _commentService.GetComments(AssignId);
+            //return View(list);  
         }
 
         [Authorize]
         public IActionResult AssignList()
         {
+            //Guid decriptID = new Guid(System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(AssignId)));
+            //return View(_commentService.GetComments(decriptID));
             var list = _assignmentService.GetAssignments(User.Identity.Name);
+            var ip = HttpContext.Connection.RemoteIpAddress;
+            _logger.LogInformation("-->" + User.Identity.Name + " has entered the assignment list page from this Ip address " + ip);
             return View(list);
-
         }
+
 
 
     }

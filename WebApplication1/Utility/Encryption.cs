@@ -49,11 +49,6 @@ namespace WebApplication1.Utility
     public class Encryption
     {
 
-        /// <summary>
-        /// This method takes a string and returns the digest as a string
-        /// </summary>
-        /// <param name="clearText"></param>
-        /// <returns></returns>
         public static string Hash(string clearText)
         {
             //convert the clearText into an array of bytes
@@ -190,6 +185,20 @@ namespace WebApplication1.Utility
 
         public static string SymmetricEncrypt(string clearData)
          {
+
+            /*
+            byte[] cipherDataAsBytes = Convert.FromBase64String(clearData);
+            byte[] clearDataAsBytes = SymmetricDecrypt(cipherDataAsBytes);
+            string originalText = Encoding.UTF32.GetString(clearDataAsBytes);
+
+            if (originalText.Contains('(') || originalText.Contains('&')||  originalText.Contains(')'))
+            {
+                originalText.Replace('(', '/');
+                originalText.Replace('&', '+');
+                originalText.Replace(')', '=');
+            }
+            return originalText*/
+
             //1. convert
             //   To convert any input (given by the user) we normally use Encoding.<character set>.GetBytes(...)
 
@@ -207,12 +216,24 @@ namespace WebApplication1.Utility
             //in a querystring
 
             return cipher;
-         }
+        }
 
         public static string SymmetricDecrypt(string cipher)
         {
+            byte[] clearDataAsBytes = Encoding.UTF32.GetBytes(cipher);
+            byte[] cipherAsBytes = SymmetricEncrypt(clearDataAsBytes);
+            string result = Convert.ToBase64String(cipherAsBytes);
 
-            //remember to replace back any of the characters / + =
+            if (result.Contains('/') || result.Contains('+') || result.Contains('='))
+            {
+                result.Replace('/', '(');
+                result.Replace('+', '&');
+                result.Replace('=', ')');
+            }
+            return result;
+
+
+            /*remember to replace back any of the characters / + =
 
             //1. convert
             //   To convert any input (given by the user) we normally use Encoding.<character set>.GetBytes(...)
@@ -226,7 +247,7 @@ namespace WebApplication1.Utility
             // to convert from base64 bytes (which is the output of any cryptographic algorithm) we have to use Convert.ToBase64String...
             string originalText = Encoding.UTF32.GetString(clearDataAsBytes);
 
-            return originalText;
+            return originalText;*/
         }
 
 
@@ -335,7 +356,7 @@ namespace WebApplication1.Utility
         }
 
         public static bool VerifyData(MemoryStream data, string publicKey, string signature)
-        {
+        {     
             RSACryptoServiceProvider myAlg = new RSACryptoServiceProvider();
             myAlg.FromXmlString(publicKey);
 

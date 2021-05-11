@@ -12,8 +12,10 @@
                     <p class="card-text">Owner: @item.Owner</p>
                     <a href="/FileUpload/Comment?AssignId=@item.Id" type="button" class="btn btn-outline-success">Add Comment</a>
                     <br /><br />
-                    <a href="/FileUpload/ViewComments?AssignId=@item.Id" type="button" class="btn btn-warning">View Comments</a>
+                          <a asp-action="ViewComments" asp-controller="FileUpload" asp-route-id=@Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(@item.Id.ToString())) class="btn btn-warning">View Comments</a>
+                    <!--<a href="/FileUpload/ViewComments?AssignId=@item.Id" type="button" class="btn btn-warning">View Comments</a>-->
                     <br /><br />
+
                     <a href="/FileUpload/Download?AssignId=@item.Id" type="button" class="btn btn-danger">Download Assignment</a>
                 </div>
             </div>

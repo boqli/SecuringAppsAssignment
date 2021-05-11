@@ -53,7 +53,7 @@ namespace WebApplication1.Controllers
            
 
            var cipher =  Encryption.AsymmetricEncrypt("aGVsbG8gd29ybGQ=", asymmetricKeys.PublicKey);
-            var originalText = Encryption.AsymmetricDecrypt(cipher, asymmetricKeys.PrivateKey);
+           var originalText = Encryption.AsymmetricDecrypt(cipher, asymmetricKeys.PrivateKey);
 
 
             return View();

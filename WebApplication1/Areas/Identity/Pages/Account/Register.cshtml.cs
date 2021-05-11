@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
@@ -17,16 +16,17 @@ using MailKit.Net.Smtp;
 using WebApplication1.Models;
 using ShoppingCart.Application.Interfaces;
 using ShoppingCart.Application.ViewModels;
+using WebApplication1.Utility;
 
 namespace WebApplication1.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
     public class RegisterModel : PageModel
     {
+        
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
-        private readonly IEmailSender _emailSender;
         private readonly IStudentTeacherService _studentTeacherService;
         private readonly StudentTeacherViewModel data = new StudentTeacherViewModel();
 
@@ -34,14 +34,12 @@ namespace WebApplication1.Areas.Identity.Pages.Account
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger, 
-            IStudentTeacherService studentTeacherService,
-            IEmailSender emailSender)
+            IStudentTeacherService studentTeacherService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _studentTeacherService = studentTeacherService;
-            _emailSender = emailSender;
         }
 
         [BindProperty]
@@ -89,11 +87,12 @@ namespace WebApplication1.Areas.Identity.Pages.Account
         {
             string password = GeneratePassword();
 
+            var pubpriKeys = Encryption.GenerateAsymmetricKeys();
             returnUrl = returnUrl ?? Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email, FirstName = Input.FirstName, LastName = Input.LastName, Address= Input.Address };
+                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email, FirstName = Input.FirstName, LastName = Input.LastName, Address= Input.Address, PrivateKey = pubpriKeys.PrivateKey,PublicKey = pubpriKeys.PublicKey };
                 var result = await _userManager.CreateAsync(user, password);
                 if (result.Succeeded)
                 {
@@ -111,7 +110,6 @@ namespace WebApplication1.Areas.Identity.Pages.Account
                     data.teacherEmail = User.Identity.Name;
                     data.studentEmail = Input.Email;
                     _studentTeacherService.AddMember(data);
-
 
                     /*
                     await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
