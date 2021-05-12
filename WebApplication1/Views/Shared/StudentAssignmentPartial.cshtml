@@ -1,29 +1,35 @@
 ﻿@model IEnumerable<ShoppingCart.Application.ViewModels.AssignmentViewModel>
-
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+<h1 class="text-center display-4">Assignments</h1>
 <br />
 <div class="row">
-    @foreach (var item in Model)
+    @if (SignInManager.IsSignedIn(User))
     {
-        <div class="col-4">
+        @foreach (var item in Model)
+        {
+            <div class="col-4">
 
-            <div class="card text-center" style="width: 18rem;">
-                <div class="card-body">
-                    <h5 class="card-title">@item.FileName</h5>
-                    <p class="card-subtitle">@item.Description</p><br />
-                    <p class="card-text">Owner: @item.Owner</p>
+                <div class="card text-center" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">@item.FileName</h5>
+                        <p class="card-subtitle">@item.Description</p><br />
+                        <p class="card-text">Owner: @item.Owner</p>
 
-                    <a href="/FileUpload/Comment?AssignId=@item.Id" type="button" class="btn btn-outline-success">Add Comment</a>
-                    <br /><br />
-                    <a asp-action="ViewComments" asp-controller="FileUpload" asp-route-id=@Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(@item.Id.ToString())) class="btn btn-warning">View Comments</a>
-                    <!--<a href="/FileUpload/ViewComments?AssignId=@item.Id" type="button" class="btn btn-warning">View Comments</a>-->
+                        <a href="/FileUpload/Comment?AssignId=@item.Id" type="button" class="btn btn-outline-success">Add Comment</a>
+                        <br /><br />
+                        <a asp-action="ViewComments" asp-controller="FileUpload" asp-route-id=@Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(@item.Id.ToString())) class="btn btn-warning">View Comments</a>
+                        <!--<a href="/FileUpload/ViewComments?AssignId=@item.Id" type="button" class="btn btn-warning">View Comments</a>-->
 
-                    <br />
+                        <br />
+                    </div>
                 </div>
+                <br />
             </div>
-            <br />
-        </div>
+        }
     }
-</div>
-<!--
-                    <a asp-action="ViewComments" asp-controller="FileUpload" asp-route-id=Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(item.Id.ToString()))>Add Submission</a>
-                    -->
+    </div>
+    <!--
+                        <a asp-action="ViewComments" asp-controller="FileUpload" asp-route-id=Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(item.Id.ToString()))>Add Submission</a>
+                        -->

@@ -1,17 +1,24 @@
 ﻿@model IEnumerable<ShoppingCart.Application.ViewModels.CommentViewModel>
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 
 <br />
 <div class="row">
-    @foreach (var item in Model)
+    @if (SignInManager.IsSignedIn(User))
     {
-        <div class="col-4">
-            <div class="card text-center" style="width: 18rem;">
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">Comment: @item.CommentText</li>
-                    <li class="list-group-item">Owner: @item.CommenterId</li>
-                </ul>
+
+        @foreach (var item in Model)
+        {
+            <div class="col-4">
+                <div class="card text-center" style="width: 18rem;">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Comment: @item.CommentText</li>
+                        <li class="list-group-item">Owner: @item.CommenterId</li>
+                    </ul>
+                </div>
+                <br />
             </div>
-            <br />
-        </div>
+        }
     }
 </div>

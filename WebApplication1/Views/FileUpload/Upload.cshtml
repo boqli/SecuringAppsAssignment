@@ -1,5 +1,7 @@
 ﻿@model ShoppingCart.Application.ViewModels.AssignmentViewModel
-
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 @{
     ViewData["Title"] = "Upload";
 }
@@ -8,34 +10,37 @@
 
 <hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Upload" enctype="multipart/form-data">
-            <div div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            @Html.AntiForgeryToken()
-            <div class="form-group">
-                <label asp-for="FileName" class="control-label"></label>
-                <input asp-for="FileName" class="form-control" />
-                <span asp-validation-for="FileName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Path" class="control-label"></label>
-                <!--<input asp-for="Path" class="form-control" />-->
-                <input asp-for="Path" name="file" type="file" class="form-control" />
-                <span asp-validation-for="Path" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input asp-for="Owner" class="form-control" hidden value="@User.Identity.Name" />
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Upload" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <div class="col-md-4">
+            <form asp-action="Upload" enctype="multipart/form-data">
+                <div div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <label asp-for="FileName" class="control-label"></label>
+                    <input asp-for="FileName" class="form-control" />
+                    <span asp-validation-for="FileName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Description" class="control-label"></label>
+                    <input asp-for="Description" class="form-control" />
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Path" class="control-label"></label>
+                    <!--<input asp-for="Path" class="form-control" />-->
+                    <input asp-for="Path" name="file" type="file" class="form-control" />
+                    <span asp-validation-for="Path" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input asp-for="Owner" class="form-control" hidden value="@User.Identity.Name" />
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Upload" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    }
 </div>
 
 <div>

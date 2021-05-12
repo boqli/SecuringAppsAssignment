@@ -40,6 +40,8 @@ namespace WebApplication1.Controllers
             _assignmentService = assignmentService;
             _commentService = commentService;
         }
+
+        [Authorize]
         public IActionResult Index(string Id)
         {
             if (User.IsInRole("Teacher"))
@@ -73,18 +75,18 @@ namespace WebApplication1.Controllers
             {
                 if (avm != null)
                 {
+                    //if(avm.TaskId)
                     avm.Description = HtmlEncoder.Default.Encode(avm.Description);
                     avm.FileName = HtmlEncoder.Default.Encode(avm.FileName);
                     var ip = HttpContext.Connection.RemoteIpAddress; ;
                     if (System.IO.Path.GetExtension(file.FileName) == ".pdf" && file.Length < 1048576)
                     {
+                       
                         //25 50 44 46 2d >> 37 80 68 70 45 PDF
                         byte[] whitelist = new byte[] { 37, 80, 68, 70, 45 };
                         if (file != null)
                         {
                             var sign = await _userManager.FindByNameAsync(User.Identity.Name);
-                            
-                            MemoryStream userFile = new MemoryStream();
                             
                             using (var f = file.OpenReadStream())
                             {
@@ -165,23 +167,32 @@ namespace WebApplication1.Controllers
             //1. get who is the owner of the file with id = id
             //2. you fetch the private key
             //3. call the HybridDecrypt 
-
             var assignment = _assignmentService.GetAssignment(AssignId);
             var webClient = new System.Net.WebClient();
             string absolutePath = _env.WebRootPath + @"\Files\" + assignment.Path;
             var downData = webClient.DownloadData(absolutePath);
             var sign = await _userManager.FindByNameAsync(User.Identity.Name);
-            MemoryStream toDownload = new MemoryStream(Encoding.UTF32.GetBytes(assignment.FileName));// = HybridDecrypt(...)
-            //new System.IO.MemoryStream(downData);
-            bool result = Encryption.VerifyData(toDownload, sign.PublicKey, assignment.Signature);
-            //bool = false
-            var fileDownloadName = assignment.FileName+".pdf";
-            var ip = HttpContext.Connection.RemoteIpAddress;
-            _logger.LogInformation("-->" + User.Identity.Name + " has successfully downloaded a file from this Ip address " + ip);
-            return File(toDownload, "application/octet-stream" , Guid.NewGuid() +"-"+ fileDownloadName);
+            MemoryStream toDownload = new MemoryStream(downData);
 
-            
+            MemoryStream other = new MemoryStream(Encoding.UTF32.GetBytes(assignment.FileName));// = HybridDecrypt(...)
+            other.Position = 0;
 
+            //encrypt upload decrypt down
+            //-->bool = false
+           
+            //return File(toDownload, "application/octet-stream", Guid.NewGuid() + "-" + fileDownloadName);
+             
+            if (Encryption.VerifyData(toDownload, sign.PublicKey, assignment.Signature)) {
+                var fileDownloadName = assignment.FileName + ".pdf";
+                var ip = HttpContext.Connection.RemoteIpAddress;
+                _logger.LogInformation("-->" + User.Identity.Name + " has successfully downloaded a file from this Ip address " + ip);
+                return File(toDownload, "application/octet-stream", Guid.NewGuid() + "-" + fileDownloadName);
+            }
+            else
+            {
+                TempData["error"] = "File could not be downloaded!";
+                return View();
+            }
             /*
             MemoryStream toDownload = new MemoryStream(Encoding.UTF32.GetBytes(fileName));
             toDownload.Position = 0;
@@ -201,7 +212,7 @@ namespace WebApplication1.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public IActionResult Comment(Guid AssignId, CommentViewModel cvm)
+        public IActionResult Comment(CommentViewModel cvm)
         {
 
             cvm.AssignmentID = assignmentID;

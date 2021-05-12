@@ -1,5 +1,7 @@
 ﻿@model ShoppingCart.Application.ViewModels.CommentViewModel
-
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 @{
     ViewData["Title"] = "Comment";
 }
@@ -8,24 +10,27 @@
 
 <hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Comment">
-            @Html.AntiForgeryToken()
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            
-            <div class="form-group">
-                <label asp-for="CommentText" class="control-label">Comment</label>
-                <input asp-for="CommentText" class="form-control" />
-                <span asp-validation-for="CommentText" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input asp-for="CommenterId" class="form-control" hidden value="@User.Identity.Name" />
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <div class="col-md-4">
+            <form asp-action="Comment">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-group">
+                    <label asp-for="CommentText" class="control-label">Comment</label>
+                    <input asp-for="CommentText" class="form-control" />
+                    <span asp-validation-for="CommentText" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input asp-for="CommenterId" class="form-control" hidden value="@User.Identity.Name" />
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Create" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    }
 </div>
 
 

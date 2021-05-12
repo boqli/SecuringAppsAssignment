@@ -6,15 +6,8 @@
 <div class="text-center">
     @if (SignInManager.IsSignedIn(User))
     {
-        @if (!(User.IsInRole("Teacher")))
-        {
 
-            @Html.Partial("ViewTaskPartial", Model)
+        @Html.Partial("ViewTaskPartial", Model)
 
-        }
-        @if (User.IsInRole("Teacher"))
-        {
-            @Html.Partial("ViewTaskPartial", Model)
-        }
     }
 </div>

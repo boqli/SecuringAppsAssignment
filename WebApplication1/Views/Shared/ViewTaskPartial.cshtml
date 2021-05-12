@@ -1,31 +1,37 @@
 ﻿@model IEnumerable<ShoppingCart.Application.ViewModels.CreateTaskViewModel>
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 <h1 class="text-center display-4">View Tasks</h1>
 <br />
 <div class="row">
-    @foreach (var item in Model)
+    @if (SignInManager.IsSignedIn(User))
     {
-        <div class="col-4">
-            <div class="card text-center" style="width: 18rem; padding:2rem; ">
-                <div class="card-body">
-                    <h5 class="card-title">@item.taskTitle</h5>
-                    <p class="card-subtitle">@item.taskDescription</p><br />
-                    <p class="card-text">Deadline: @item.taskDeadline</p>
-                    @if (User.IsInRole("Teacher"))
-                    {
-                        <a asp-action="Index" asp-controller="FileUpload" asp-route-id=@Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(@item.taskId.ToString())) class="btn btn-danger">View Submissions</a>
-                        <!--<a href="/FileUpload?taskId=@item.taskId" type="button" class="btn btn-danger">View Submissions</a-->
-                    }
-                    @if (!(User.IsInRole("Teacher")))
-                    {
-                        <!--a asp-action="Upload" asp-controller="FileUpload" asp-route-id=@Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(@item.taskId.ToString())) class="btn btn-danger">Submit Assignment</a>-->
-                        <a href="/FileUpload/Upload?taskId=@item.taskId" type="button" class="btn btn-danger">Submit Assignment</a>
-                    }
+        @foreach (var item in Model)
+        {
+            <div class="col-4">
+                <div class="card text-center" style="width: 18rem; padding:2rem; ">
+                    <div class="card-body">
+                        <h5 class="card-title">@item.taskTitle</h5>
+                        <p class="card-subtitle">@item.taskDescription</p><br />
+                        <p class="card-text">Deadline: @item.taskDeadline</p>
+                        @if (User.IsInRole("Teacher"))
+                        {
+                            <a asp-action="Index" asp-controller="FileUpload" asp-route-id=@Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(@item.taskId.ToString())) class="btn btn-danger">View Submissions</a>
+                            <!--<a href="/FileUpload?taskId=@item.taskId" type="button" class="btn btn-danger">View Submissions</a-->
+                        }
+                        @if (!(User.IsInRole("Teacher")))
+                        {
+                            <!--a asp-action="Upload" asp-controller="FileUpload" asp-route-id=@Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(@item.taskId.ToString())) class="btn btn-danger">Submit Assignment</a>-->
+                            <a href="/FileUpload/Upload?taskId=@item.taskId" type="button" class="btn btn-danger">Submit Assignment</a>
+                        }
+                    </div>
                 </div>
             </div>
-        </div>
-        <br />
-        //#0_r$RLA
-        //student password
+            <br />
+            //#0_r$RLA
+            //student password
 
+        }
     }
 </div>

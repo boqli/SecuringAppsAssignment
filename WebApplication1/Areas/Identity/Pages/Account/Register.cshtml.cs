@@ -94,9 +94,12 @@ namespace WebApplication1.Areas.Identity.Pages.Account
             {
                 var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email, FirstName = Input.FirstName, LastName = Input.LastName, Address= Input.Address, PrivateKey = pubpriKeys.PrivateKey,PublicKey = pubpriKeys.PublicKey };
                 var result = await _userManager.CreateAsync(user, password);
+                var ip = HttpContext.Connection.RemoteIpAddress;
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User created a new account with password.");
+                    
+                    _logger.LogInformation("-->" + User.Identity.Name + " has successfully created a new account with a password from this Ip address " + ip);
+
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
@@ -150,6 +153,9 @@ namespace WebApplication1.Areas.Identity.Pages.Account
                     }
                     
                 }
+                
+                _logger.LogError("-->" + User.Identity.Name + " could not create an account from this Ip address " + ip);
+
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);

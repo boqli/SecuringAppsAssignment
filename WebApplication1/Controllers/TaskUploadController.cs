@@ -26,6 +26,7 @@ namespace WebApplication1.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public IActionResult Index()
         {
             if (User.IsInRole("Teacher"))
