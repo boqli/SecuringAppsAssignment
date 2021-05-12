@@ -84,7 +84,7 @@ namespace WebApplication1
             loggerFactory.AddFile("logs/mylog-{Date}.txt");
 
             //-----------------------------------------------------------------------RECOMMENT THS----------------------------------------------------------------------------------------
-            
+            /*
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -97,7 +97,7 @@ namespace WebApplication1
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
+            */
             ////////////
             app.UseExceptionHandler("/Home/Error");
             app.UseHsts();
